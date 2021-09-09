@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>MotiNote</title>
+</head>
+
+<div class="container">
+<h1 class="main_title">
+   Motivation Note  
+</h1>
+
+<h1 class="sub_title">
+  ～書いてアタマを整理する～ 
+</h1>
+</div>
+
+<p id="today"> </p>
+
+<link rel="stylesheet" href="note.css">
+
+
+
+<body>
+
+
+  <script>
+    //今日の日付データを変数に格納
+            //変数は"today"とする
+            var today=new Date(); 
+
+            var year = today.getFullYear();
+            var month = today.getMonth()+1;
+            var week = today.getDay();
+            var day = today.getDate();
+
+            var week_ja= new Array("日","月","火","水","木","金","土");
+     
+                     
+        var str = year+"年"+month+"月"+day+"日 "+week_ja[week]+"曜日";
+        document.getElementById('today').innerHTML = str ;
+        
+        cosole.log(str)            
+
+    </script>
+
+
+  <!-- ここからaudio -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+      
+  <h1 class="audio_mpeg">
+  <audio type="audio/mpeg" src="bgm.mp3" controls></audio>
+  </h1>
+
+
+
+  <script>
+      window.addEventListener('DOMContentLoaded', function(){
+
+      const audioElement = document.querySelector("audio");
+
+      audioElement.addEventListener('loadeddata', (e)=> {
+      // audioElement.muted = true;
+      audioElement.autoplay = true;
+      });
+      });
+
+  </script>
+
+    <!-- ここまでaudio -->
+
+
+
+
+  <!-- コンテンツ表示画面 -->
+
+  <h1 class="text_title">
+
+    <!-- Date -->
+    Date　　　　
+    <!-- <input type="text" id="username" cols="40" rows="3"> -->
+    <textarea date="" id="username" cols="40" rows="3">Date</textarea> 
+
+  <!-- <div>
+    テキストエリア
+   Date　　　　
+    <textarea name="" id="text" cols="40" rows="3" >Date </textarea>
+  </div>   --> 
+
+
+  <div class="text1">
+    <!-- テキストエリア -->
+    Fact　　　　
+    <textarea name="" id="text1" cols="150" rows="5" >Fact</textarea>
+  </div>
+
+  <div>
+    <!-- テキストエリア -->
+    SoWhat？　
+    <textarea name="" id="text2" cols="150" rows="5" >SoWhat?</textarea>
+  </div>
+
+  <div>
+    <!-- テキストエリア -->
+    Aha！　　　
+    <textarea name="" id="text3" cols="150" rows="5">Aha！</textarea>
+  </div>
+
+  <div>
+    <!-- テキストエリア -->
+    Next!!　　　
+    <textarea name="" id="text4" cols="150" rows="5">Next!!</textarea>
+  </div>
+
+</h1>
+
+  <div>
+    <!-- 送信ボタン -->
+    <button id="send">SAVE</button>
+
+  </div>
+
+  <div>
+    <!-- 保存されたデータが表示される箇所 -->
+    <div id="output"></div>
+  </div>　　　　
+
+
+
+  <!--/ コンテンツ表示画面 -->
+
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <!-- JQuery -->
+
+  <!--** 以下Firebase **-->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <!-- 6.6.1に該当する箇所はfirebaseのバージョンですので更新されるたびに随時変わります -->
+  <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#config-web-app -->
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "",
+      authDomain: "dev21chat-7d641.firebaseapp.com",
+      databaseURL: "https://dev21chat-7d641-default-rtdb.firebaseio.com/",
+      projectId: "dev21chat-7d641",
+      storageBucket: "dev21chat-7d641.appspot.com",
+      messagingSenderId: "365676576801",
+      appId: "1:365676576801:web:fdd47aab02080e5b702360"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    //firebaseのデーターベース（保存させる場所）
+    let newPostRef = firebase.database().ref();
+
+    // ここからjquery
+
+    // 送信ボタンをクリックされたら次の処理をする
+    $("#send").on("click", function () {
+      // データを登録で送る
+      newPostRef.push({
+        username: $("#username").val(), //Date
+        text: $("#text").val(),//テキストエリア
+        text2: $("#text1").val(),//テキストエリア
+        text2: $("#text2").val(),//テキストエリア
+        text3: $("#text3").val(),//テキストエリア
+        text4: $("#text4").val()//テキストエリア
+
+      })
+      $("#username").val(""); //空にする
+      $("#text").val(""); //空にする
+      $("#text1").val(""); //空にする
+      $("#text2").val(""); //空にする
+      $("#text3").val(""); //空にする
+      $("#text4").val(""); //空にする
+     
+    });
+
+
+
+    // 受信処理
+    newPostRef.on("child_added", function (data) {
+      let v =data.val();
+      let k =data.key;
+
+      console.log(v); //vの変数に入っているオブジェクトを全てみる
+      let str = `<p>${v.username}<br>${v.text}</p>`;  
+
+      
+      // ここでデータをhtmlに埋め込む
+      $("#output").prepend(str);
+    })
+
+    $("#text").on("keydown", function (e) {
+      console.log(e, "event");
+
+      // エンターキーを押したら送信処理を実行
+      if (e.keyCode === 13) {
+        newPostRef.push({
+          username: $("#username").val(), //Date
+          text: $("#text").val(), //テキストエリア
+          text1: $("#text1").val(), //テキストエリア
+          text2: $("#text2").val(), //テキストエリア
+          text3: $("#text3").val(), //テキストエリア
+          text4: $("#text4").val() //テキストエリア
+        })
+        $("#username").val(""); //空にする
+        $("#text").val(""); //空にする
+        $("#text1").val(""); //空にする
+        $("#text2").val(""); //空にする
+        $("#text3").val(""); //空にする
+        $("#text4").val(""); //空にする
+        
+        
+
+
+
+      }
+    })
+
+  </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/1.2.2/marked.min.js"></script>
+<script src="note.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</body>
+
+</html>
